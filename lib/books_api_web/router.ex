@@ -7,7 +7,8 @@ defmodule BooksApiWeb.Router do
 
   scope "/api", BooksApiWeb do
     pipe_through :api
-    get "/books", BooksController , :index
+    get "/books", BooksController, :index
+    post "/books", BooksController, :create
 
   end
 
