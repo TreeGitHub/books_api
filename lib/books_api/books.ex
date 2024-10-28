@@ -5,7 +5,6 @@ defmodule BooksApi.Books do
 
   import Ecto.Query, warn: false
   alias BooksApi.Repo
-
   alias BooksApi.Books.Book
 
   @doc """
@@ -35,8 +34,9 @@ defmodule BooksApi.Books do
       ** (Ecto.NoResultsError)
 
   """
-  def get_book!(id), do: Repo.get!(Book, id)
-
+  def get_book!(id) do
+    Repo.get!(Book, id)
+  end
   @doc """
   Creates a book.
 
@@ -67,26 +67,24 @@ defmodule BooksApi.Books do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_book(%Book{} = book, attrs) do
-    book
-    |> Book.changeset(attrs)
-    |> Repo.update()
+  def update_book(id, attrs) do
+    book = Repo.get(Book, id)
+    case book do
+      _book ->
+        book
+        |> Book.changeset(attrs)
+        |> Repo.update()
+    end
   end
 
   @doc """
   Deletes a book.
-
-  ## Examples
-
-      iex> delete_book(book)
-      {:ok, %Book{}}
-
-      iex> delete_book(book)
-      {:error, %Ecto.Changeset{}}
-
   """
-  def delete_book(%Book{} = book) do
-    Repo.delete(book)
+  def delete_book(id) do
+    book = Repo.get(Book, id)
+    case book do
+      _book -> Repo.delete(book)
+    end
   end
 
   @doc """
