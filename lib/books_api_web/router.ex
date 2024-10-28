@@ -9,6 +9,9 @@ defmodule BooksApiWeb.Router do
     pipe_through :api
     get "/books", BooksController, :index
     post "/books", BooksController, :create
+    get "/books/:id", BooksController, :show
+    delete "/books/:id", BooksController, :delete
+    put "/books/:id", BooksController, :update
 
   end
 
