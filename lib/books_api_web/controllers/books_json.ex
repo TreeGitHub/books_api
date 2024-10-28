@@ -9,11 +9,14 @@ defmodule BooksApiWeb.BooksJSON do
 		%{data: data(book)}
 	end
 
-	defp data(%Book{} = datum) do
+	defp data(%Book{} = book) do
 		%{
-			title: datum.title,
-			tagline: datum.tagline,
-			summary: datum.summary
+			id: book.id,
+			title: book.title,
+			tagline: book.tagline,
+			summary: book.summary,
+			inserted_at: book.inserted_at,
+			updated_at: book.updated_at
 		}
 	end
 end

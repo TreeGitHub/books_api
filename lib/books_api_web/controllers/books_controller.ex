@@ -9,7 +9,9 @@ defmodule BooksApiWeb.BooksController do
 
 
 	def create(conn,  book_params) do
-		Books.create_book(book_params)
-		json(conn, %{book: book_params})
+		case Books.create_book(book_params) do
+			{:ok, book} ->
+				render(conn, :show, book: book)
+			end
 	end
 end
