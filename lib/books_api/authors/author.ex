@@ -12,5 +12,6 @@ defmodule BooksApi.Authors.Author do
     author
     |> cast(attrs, [:name])
     |> validate_required([:name])
+    |> unique_constraint(:name, message: "Author name must be unique")
   end
 end

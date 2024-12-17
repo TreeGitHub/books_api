@@ -5,8 +5,8 @@ defmodule BooksApi.Books do
   def list_books do
     Repo.all(Book)
   end
-  def get_book!(id) do
-    Repo.get!(Book, id)
+  def get_book(id) do
+    Repo.get(Book, id)
   end
   def create_book(attrs \\ %{}) do
     %Book{}
