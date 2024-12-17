@@ -7,18 +7,8 @@ defmodule BooksApiWeb.Router do
 
   scope "/api", BooksApiWeb do
     pipe_through :api
-    get "/books", BooksController, :index
-    post "/books", BooksController, :create
-    get "/books/:id", BooksController, :show
-    delete "/books/:id", BooksController, :delete
-    put "/books/:id", BooksController, :update
-
-    get "/authors", AuthorController, :index
-    post "/authors", AuthorController, :create
-    get "/authors/:id", AuthorController, :show
-    delete "/authors/:id", AuthorController, :delete
-    put "/authors/:id", AuthorController, :update
-
+    resources "/books", BooksController, only: [:index, :show, :create, :delete, :update]
+    resources "/authors", AuthorsController, only: [:index, :show, :create, :delete, :update]
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

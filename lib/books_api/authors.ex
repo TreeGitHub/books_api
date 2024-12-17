@@ -5,8 +5,8 @@ defmodule BooksApi.Authors do
   def list_authors do
     Repo.all(Author)
   end
-  def get_author!(id) do
-    Repo.get!(Author, id)
+  def get_author(id) do
+    Repo.get(Author, id)
   end
   def create_author(attrs \\ %{}) do
     %Author{}
