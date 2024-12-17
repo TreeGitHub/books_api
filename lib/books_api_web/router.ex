@@ -13,6 +13,12 @@ defmodule BooksApiWeb.Router do
     delete "/books/:id", BooksController, :delete
     put "/books/:id", BooksController, :update
 
+    get "/authors", AuthorController, :index
+    post "/authors", AuthorController, :create
+    get "/authors/:id", AuthorController, :show
+    delete "/authors/:id", AuthorController, :delete
+    put "/authors/:id", AuthorController, :update
+
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

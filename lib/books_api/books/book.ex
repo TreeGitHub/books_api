@@ -14,6 +14,6 @@ defmodule BooksApi.Books.Book do
   def changeset(book, attrs) do
     book
     |> cast(attrs, [:title, :tagline, :summary])
-    |> validate_required([:title, :tagline, :summary])
+    |> validate_required([:title])
   end
 end
