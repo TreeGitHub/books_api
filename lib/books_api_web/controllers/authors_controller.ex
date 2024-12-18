@@ -9,17 +9,24 @@ defmodule BooksApiWeb.AuthorsController do
     |> render("index.json", authors: authors)
   end
   def create(conn, %{"name" => name}) do
-    case Authors.create_author(%{name: name}) do
+    case Authors.create_author(%{"name" => name}) do
       {:ok, author} ->
         conn
         |> put_status(:created)
         |> put_view(BooksApiWeb.AuthorsJson)
         |> render("show.json", author: author)
-      {:error, changeset} ->
+
+      {:error, :author_exists} ->
+        conn
+        |> put_status(:conflict)
+        |> put_view(BooksApiWeb.ErrorJSON)
+        |> render("409.json", resource: "Author with this name already exists")
+
+      _error ->
         conn
         |> put_status(:unprocessable_entity)
         |> put_view(BooksApiWeb.ErrorJSON)
-        |> render("422.json", changeset: changeset)
+        |> render("422.json", resource: "Invalid data")
     end
   end
   def show(conn, %{"id" => id}) do
@@ -56,20 +63,35 @@ defmodule BooksApiWeb.AuthorsController do
         end
     end
   end
-  def update(conn, %{"id" =>id, "author" => author_params}) do
-      case Authors.get_author(id) do
-        nil ->
-          conn
-          |> put_status(:not_found)
-          |> put_view(BooksApiWeb.ErrorJSON)
-          |> render("404.json", resource: "Author")
-        _author ->
-		      case Authors.update_author(id, author_params) do
-            {:ok, author} ->
-				      conn
-            |> put_view(BooksApiWeb.AuthorsJson)  # Explicitly use AuthorsJson here
-            |> render("show.json", author: author)
-          end
-		end
-	end
+  def update(conn, %{"id" => id, "author" => author_params}) do
+    case Authors.update_author(id, author_params) do
+      {:ok, author} ->
+        conn
+        |> put_view(BooksApiWeb.AuthorsJson)
+        |> render("show.json", author: author)
+
+      {:error, :author_not_found} ->
+        conn
+        |> put_status(:not_found)
+        |> put_view(BooksApiWeb.ErrorJSON)
+        |> render("404.json", resource: "Author")
+
+      {:error, :author_exists} ->
+        conn
+        |> put_status(:conflict)  # 409 Conflict
+        |> put_view(BooksApiWeb.ErrorJSON)
+        |> render("409.json", resource: "Author with this name already exists")
+
+      {:error, :no_changes} ->
+        conn
+        |> put_status(:unprocessable_entity)  # 422 Unprocessable Entity
+        |> json(%{error: "No changes detected"})
+
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> put_view(BooksApiWeb.ErrorJSON)
+        |> render("422.json", changeset: changeset)
+    end
+  end
 end
