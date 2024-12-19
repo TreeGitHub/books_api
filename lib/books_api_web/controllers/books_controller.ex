@@ -12,7 +12,7 @@ defmodule BooksApiWeb.BooksController do
 		case Books.create_book(book_params) do
 			{:ok, book} ->
 				conn
-        |> put_view(BooksApiWeb.BooksJSON)  # Explicitly use AuthorsJson here
+        |> put_view(BooksApiWeb.BooksJSON)
         |> render("show.json", book: book)
 			{:error, changeset} ->
 				conn

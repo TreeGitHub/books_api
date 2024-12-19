@@ -4,7 +4,6 @@ defmodule BooksApi.Authors.Author do
 
   schema "authors" do
     field :name, :string
-
     timestamps(type: :utc_datetime)
   end
 

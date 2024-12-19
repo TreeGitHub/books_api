@@ -7,7 +7,7 @@ defmodule BooksApi.Repo.Migrations.CreateBooks do
       add :tagline, :string
       add :summary, :text
 
-      timestamps(type: :utc_datetime)
+      timestamps()
     end
   end
 end

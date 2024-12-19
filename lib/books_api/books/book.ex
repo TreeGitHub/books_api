@@ -6,8 +6,7 @@ defmodule BooksApi.Books.Book do
     field :title, :string
     field :tagline, :string
     field :summary, :string
-
-    timestamps(type: :utc_datetime)
+    timestamps()
   end
 
   @doc false

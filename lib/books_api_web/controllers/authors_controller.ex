@@ -1,13 +1,20 @@
 defmodule BooksApiWeb.AuthorsController do
-	use Phoenix.Controller, formats: [:json]
+  use Phoenix.Controller, formats: [:json]
   alias BooksApi.Authors
 
+  @doc """
+  Lists all authors.
+  """
   def index(conn, _params) do
     authors = Authors.list_authors()
     conn
-    |> put_view(BooksApiWeb.AuthorsJson) # Explicitly set the view
+    |> put_view(BooksApiWeb.AuthorsJson)
     |> render("index.json", authors: authors)
   end
+
+  @doc """
+  Creates a new author.
+  """
   def create(conn, %{"name" => name}) do
     case Authors.create_author(%{"name" => name}) do
       {:ok, author} ->
@@ -29,6 +36,10 @@ defmodule BooksApiWeb.AuthorsController do
         |> render("422.json", resource: "Invalid data")
     end
   end
+
+  @doc """
+  Shows a specific author.
+  """
   def show(conn, %{"id" => id}) do
     case Authors.get_author(id) do
       nil ->
@@ -39,10 +50,14 @@ defmodule BooksApiWeb.AuthorsController do
 
       author ->
         conn
-        |> put_view(BooksApiWeb.AuthorsJson)  # Explicitly use AuthorsJson here
+        |> put_view(BooksApiWeb.AuthorsJson)
         |> render("show.json", author: author)
     end
   end
+
+  @doc """
+  Deletes a specific author.
+  """
   def delete(conn, %{"id" => id}) do
     case Authors.get_author(id) do
       nil ->
@@ -50,11 +65,12 @@ defmodule BooksApiWeb.AuthorsController do
         |> put_status(:not_found)
         |> put_view(BooksApiWeb.ErrorJSON)
         |> render("404.json", resource: "Author")
+
       author ->
         case Authors.delete_author(author) do
           {:ok, _author} ->
             conn
-            |> send_resp(:no_content, "")  # Return 204 No Content for successful deletion
+            |> send_resp(:no_content, "")
 
           {:error, _reason} ->
             conn
@@ -63,6 +79,10 @@ defmodule BooksApiWeb.AuthorsController do
         end
     end
   end
+
+  @doc """
+  Updates a specific author.
+  """
   def update(conn, %{"id" => id, "author" => author_params}) do
     case Authors.update_author(id, author_params) do
       {:ok, author} ->
@@ -78,13 +98,13 @@ defmodule BooksApiWeb.AuthorsController do
 
       {:error, :author_exists} ->
         conn
-        |> put_status(:conflict)  # 409 Conflict
+        |> put_status(:conflict)
         |> put_view(BooksApiWeb.ErrorJSON)
         |> render("409.json", resource: "Author with this name already exists")
 
       {:error, :no_changes} ->
         conn
-        |> put_status(:unprocessable_entity)  # 422 Unprocessable Entity
+        |> put_status(:unprocessable_entity)
         |> json(%{error: "No changes detected"})
 
       {:error, changeset} ->
