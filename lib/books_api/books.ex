@@ -6,7 +6,7 @@ defmodule BooksApi.Books do
     Repo.all(Book)
   end
   def get_book(id) do
-    Repo.get(Book, id) |> Repo.preload(:authors)
+    Repo.get(Book, id)
   end
   def create_book(attrs \\ %{}) do
     %Book{}
@@ -28,5 +28,11 @@ defmodule BooksApi.Books do
   end
   def change_book(%Book{} = book, attrs \\ %{}) do
     Book.changeset(book, attrs)
+  end
+  # Fetch a book by its ID and preload authors through the books_authors join table
+  def get_book_with_authors(id) do
+    Book
+    |> Repo.get(id)
+    |> Repo.preload(:authors)  # Preload authors through the join table
   end
 end

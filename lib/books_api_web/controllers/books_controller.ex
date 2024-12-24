@@ -6,6 +6,8 @@ defmodule BooksApiWeb.BooksController do
 
 	def index(conn, _params) do
 		books = Books.list_books()
+					 |> Repo.preload(:authors) # Preload the associated authors
+
 		conn
 		|> put_view(BooksApiWeb.BooksJSON)
 		|> render("index.json", books: books)
@@ -24,6 +26,9 @@ defmodule BooksApiWeb.BooksController do
 		end)
 		|> case do
 			{:ok, book} ->
+				# Preload authors after creation and associate
+				book = Books.get_book_with_authors(book.id)
+
 				conn
 				|> put_status(:created)
 				|> put_view(BooksApiWeb.BooksJSON)
@@ -46,7 +51,6 @@ defmodule BooksApiWeb.BooksController do
 				|> render("422.json", changeset: changeset)
 		end
 	end
-
 	# Helper function to handle authors
 	defp associate_authors_with_book(book, authors_params) do
 		authors_params
@@ -62,16 +66,15 @@ defmodule BooksApiWeb.BooksController do
 		end
 	end
 	def show(conn, %{"id" => id}) do
-		case Books.get_book(id) do
+		case Books.get_book_with_authors(id) do
 			nil ->
         conn
         |> put_status(:not_found)
         |> put_view(BooksApiWeb.ErrorJSON)
         |> render("404.json", resource: "Book")
 			book ->
-				Logger.info("Fetched Book with Preloaded Authors: #{inspect(book)}")
 				conn
-		|> put_view(BooksApiWeb.BooksJSON)  # Explicitly use BooksJSON here
+				|> put_view(BooksApiWeb.BooksJSON)  # Explicitly use BooksJSON here
         |> render("show.json", book: book)
 		end
 	end

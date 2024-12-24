@@ -3,8 +3,9 @@ defmodule BooksApi.BooksAuthors.BookAuthor do
   import Ecto.Changeset
 
   schema "books_authors" do
-    field :book_id, :id
-    field :author_id, :id
+    # Establish the relationships with Book and Author
+    belongs_to :book, BooksApi.Books.Book
+    belongs_to :author, BooksApi.Authors.Author
 
     timestamps()
   end
