@@ -51,4 +51,15 @@ defmodule BooksApi.Authors do
   def change_author(%Author{} = author, attrs \\ %{}) do
     Author.changeset(author, attrs)
   end
+  def find_or_create_author(%{"name" => name}) do
+    case Repo.get_by(Author, name: name) do
+      nil ->
+        %Author{}
+        |> Author.changeset(%{"name" => name})
+        |> Repo.insert()
+
+      author ->
+        {:ok, author}
+    end
+  end
 end

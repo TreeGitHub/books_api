@@ -22,7 +22,6 @@ defmodule BooksApi.BooksAuthors do
         {:error, :book_author_exists}
     end
   end
-
   def update_book_author(id, attrs \\ %{}) do
     case Repo.get(BookAuthor, id) do
       nil ->
@@ -45,5 +44,20 @@ defmodule BooksApi.BooksAuthors do
   end
   def delete_book_author(%BookAuthor{} = book_author) do
     Repo.delete(book_author)
+  end
+  def create_relationship(book_id, author_id) do
+    IO.inspect(book_id, label: "Book ID")
+    IO.inspect(author_id, label: "Author ID")
+    IO.inspect(BookAuthor, label: "BookAuthor Module")
+
+    case Repo.get_by(BookAuthor, book_id: book_id, author_id: author_id) do
+      nil ->
+        %BookAuthor{}
+        |> BookAuthor.changeset(%{book_id: book_id, author_id: author_id})
+        |> Repo.insert()
+
+      _ ->
+        {:error, :duplicate_relationship}
+    end
   end
 end

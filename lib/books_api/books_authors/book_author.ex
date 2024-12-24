@@ -3,8 +3,8 @@ defmodule BooksApi.BooksAuthors.BookAuthor do
   import Ecto.Changeset
 
   schema "books_authors" do
-    field :book_id, :integer
-    field :author_id, :integer
+    field :book_id, :id
+    field :author_id, :id
 
     timestamps()
   end

@@ -22,14 +22,7 @@ defmodule BooksApiWeb.AuthorsController do
         |> put_status(:created)
         |> put_view(BooksApiWeb.AuthorsJson)
         |> render("show.json", author: author)
-
-      {:error, :author_exists} ->
-        conn
-        |> put_status(:conflict)
-        |> put_view(BooksApiWeb.ErrorJSON)
-        |> render("409.json", resource: "Author with this name already exists")
-
-      _error ->
+      :error ->
         conn
         |> put_status(:unprocessable_entity)
         |> put_view(BooksApiWeb.ErrorJSON)
@@ -68,7 +61,7 @@ defmodule BooksApiWeb.AuthorsController do
 
       author ->
         case Authors.delete_author(author) do
-          {:ok, _author} ->
+          {:ok, :deleted_author} ->
             conn
             |> send_resp(:no_content, "")
 
@@ -96,13 +89,13 @@ defmodule BooksApiWeb.AuthorsController do
         |> put_view(BooksApiWeb.ErrorJSON)
         |> render("404.json", resource: "Author")
 
-      {:error, :author_exists} ->
+      {:error, :conflict} ->
         conn
         |> put_status(:conflict)
         |> put_view(BooksApiWeb.ErrorJSON)
         |> render("409.json", resource: "Author with this name already exists")
 
-      {:error, :no_changes} ->
+      {:error, :unprocessable_entity} ->
         conn
         |> put_status(:unprocessable_entity)
         |> json(%{error: "No changes detected"})

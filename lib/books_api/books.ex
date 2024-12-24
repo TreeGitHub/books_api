@@ -6,7 +6,7 @@ defmodule BooksApi.Books do
     Repo.all(Book)
   end
   def get_book(id) do
-    Repo.get(Book, id)
+    Repo.get(Book, id) |> Repo.preload(:authors)
   end
   def create_book(attrs \\ %{}) do
     %Book{}

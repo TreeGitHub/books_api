@@ -1,6 +1,8 @@
 defmodule BooksApiWeb.BooksController do
 	use Phoenix.Controller, formats: [:json]
-	alias BooksApi.Books
+	require Logger
+	alias BooksApi.BooksAuthors
+	alias BooksApi.{Books, Repo, Authors}
 
 	def index(conn, _params) do
 		books = Books.list_books()
@@ -8,18 +10,56 @@ defmodule BooksApiWeb.BooksController do
 		|> put_view(BooksApiWeb.BooksJSON)
 		|> render("index.json", books: books)
 	end
-	def create(conn,  book_params) do
-		case Books.create_book(book_params) do
+	def create(conn, %{"title" => title, "tagline" => tagline, "summary" => summary, "authors" => authors_params}) do
+		book_params = %{"title" => title, "tagline" => tagline, "summary" => summary}
+
+		Repo.transaction(fn ->
+			# Create the book
+			with {:ok, book} <- Books.create_book(book_params),
+					 {:ok, _relations} <- associate_authors_with_book(book, authors_params) do
+				book
+			else
+				{:error, reason} -> Repo.rollback(reason)
+			end
+		end)
+		|> case do
 			{:ok, book} ->
 				conn
-        |> put_view(BooksApiWeb.BooksJSON)
-        |> render("show.json", book: book)
+				|> put_status(:created)
+				|> put_view(BooksApiWeb.BooksJSON)
+				|> render("show.json", book: book)
+
+			{:error, :author_exists} ->
+				conn
+				|> put_status(:conflict)
+				|> json(%{error: "Author already exists"})
+
+			{:error, :book_creation_failed} ->
+				conn
+				|> put_status(:unprocessable_entity)
+				|> json(%{error: "Book creation failed"})
+
 			{:error, changeset} ->
 				conn
 				|> put_status(:unprocessable_entity)
 				|> put_view(BooksApiWeb.ErrorJSON)
 				|> render("422.json", changeset: changeset)
-			end
+		end
+	end
+
+	# Helper function to handle authors
+	defp associate_authors_with_book(book, authors_params) do
+		authors_params
+		|> Enum.map(&Authors.find_or_create_author(&1)) # Create/find each author
+		|> Enum.map(fn
+			{:ok, author} -> BooksAuthors.create_relationship(book.id, author.id)
+			error -> error
+		end)
+		|> Enum.split_with(fn result -> match?({:ok, _}, result) end) # Separate successes from errors
+		|> case do
+			{relations, []} -> {:ok, relations}
+			{_, errors} -> {:error, List.first(errors)}
+		end
 	end
 	def show(conn, %{"id" => id}) do
 		case Books.get_book(id) do
@@ -29,8 +69,9 @@ defmodule BooksApiWeb.BooksController do
         |> put_view(BooksApiWeb.ErrorJSON)
         |> render("404.json", resource: "Book")
 			book ->
+				Logger.info("Fetched Book with Preloaded Authors: #{inspect(book)}")
 				conn
-        |> put_view(BooksApiWeb.BooksJSON)  # Explicitly use AuthorsJson here
+		|> put_view(BooksApiWeb.BooksJSON)  # Explicitly use BooksJSON here
         |> render("show.json", book: book)
 		end
 	end
