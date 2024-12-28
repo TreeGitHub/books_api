@@ -54,12 +54,22 @@ defmodule BooksApiWeb.BooksController do
 	# Helper function to handle authors
 	defp associate_authors_with_book(book, authors_params) do
 		authors_params
-		|> Enum.map(&Authors.find_or_create_author(&1)) # Create/find each author
+		|> Enum.map(fn author_param ->
+			case Authors.find_by_name(author_param["name"]) do
+				nil ->
+					# Author does not exist, create a new one
+					Authors.create_author(author_param)
+
+				author ->
+					# Author exists, return it directly
+					{:ok, author}
+			end
+		end)
 		|> Enum.map(fn
 			{:ok, author} -> BooksAuthors.create_relationship(book.id, author.id)
 			error -> error
 		end)
-		|> Enum.split_with(fn result -> match?({:ok, _}, result) end) # Separate successes from errors
+		|> Enum.split_with(fn result -> match?({:ok, _}, result) end)
 		|> case do
 			{relations, []} -> {:ok, relations}
 			{_, errors} -> {:error, List.first(errors)}

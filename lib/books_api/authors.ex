@@ -8,6 +8,9 @@ defmodule BooksApi.Authors do
   def get_author(id) do
     Repo.get(Author, id)
   end
+  def find_by_name(name) do
+    Repo.get_by(Author, name: name)
+  end
   def create_author(attrs \\ %{}) do
     name = attrs["name"]
     # Check if the name already exists in the database (excluding the current author)
