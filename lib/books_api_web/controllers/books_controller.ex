@@ -53,27 +53,25 @@ defmodule BooksApiWeb.BooksController do
 	end
 	# Helper function to handle authors
 	defp associate_authors_with_book(book, authors_params) do
-		authors_params
-		|> Enum.map(fn author_param ->
-			case Authors.find_by_name(author_param["name"]) do
-				nil ->
-					# Author does not exist, create a new one
-					Authors.create_author(author_param)
-
-				author ->
-					# Author exists, return it directly
-					{:ok, author}
+		Enum.reduce_while(authors_params, {:ok, []}, fn author_param, {:ok, relations} ->
+			with {:ok, author} <- find_or_create_author(author_param),
+					 {:ok, relation} <- create_author_relationship(book, author) do
+				{:cont, {:ok, [relation | relations]}}
+			else
+				{:error, reason} ->
+					Logger.error("Failed to associate author: #{inspect(reason)}")
+					{:halt, {:error, reason}}
 			end
 		end)
-		|> Enum.map(fn
-			{:ok, author} -> BooksAuthors.create_relationship(book.id, author.id)
-			error -> error
-		end)
-		|> Enum.split_with(fn result -> match?({:ok, _}, result) end)
-		|> case do
-			{relations, []} -> {:ok, relations}
-			{_, errors} -> {:error, List.first(errors)}
+	end
+	defp find_or_create_author(%{"name" => name} = author_param) do
+		case Authors.find_by_name(name) do
+			nil -> Authors.create_author(author_param)
+			author -> {:ok, author}
 		end
+	end
+	defp create_author_relationship(book, author) do
+		BooksAuthors.create_relationship(book.id, author.id)
 	end
 	def show(conn, %{"id" => id}) do
 		case Books.get_book_with_authors(id) do
