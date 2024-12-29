@@ -16,17 +16,26 @@ defmodule BooksApiWeb.AuthorsController do
   Creates a new author.
   """
   def create(conn, %{"name" => name}) do
-    case Authors.create_author(%{"name" => name}) do
+    author_params = %{"name" => name}
+
+    case Authors.create_author(author_params) do
       {:ok, author} ->
         conn
         |> put_status(:created)
         |> put_view(BooksApiWeb.AuthorsJson)
         |> render("show.json", author: author)
-      :error ->
+
+      {:error, :author_exists} ->
+        conn
+        |> put_status(:conflict) # HTTP 409 Conflict
+        |> put_view(BooksApiWeb.ErrorJSON)
+        |> render("409.json", resource: "Author with the same name already exists")
+
+      {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
         |> put_view(BooksApiWeb.ErrorJSON)
-        |> render("422.json", resource: "Invalid data")
+        |> render("422.json", errors: changeset.errors)
     end
   end
 
@@ -61,8 +70,9 @@ defmodule BooksApiWeb.AuthorsController do
 
       author ->
         case Authors.delete_author(author) do
-          {:ok, :deleted_author} ->
+          {:ok, _author} ->
             conn
+            |> put_status(:no_content)
             |> send_resp(:no_content, "")
 
           {:error, _reason} ->
@@ -89,7 +99,7 @@ defmodule BooksApiWeb.AuthorsController do
         |> put_view(BooksApiWeb.ErrorJSON)
         |> render("404.json", resource: "Author")
 
-      {:error, :conflict} ->
+      {:error, :author_exists} ->
         conn
         |> put_status(:conflict)
         |> put_view(BooksApiWeb.ErrorJSON)

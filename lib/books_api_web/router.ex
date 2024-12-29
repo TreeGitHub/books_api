@@ -9,7 +9,9 @@ defmodule BooksApiWeb.Router do
     pipe_through :api
     resources "/books", BooksController, only: [:index, :show, :create, :update, :delete]
     resources "/authors", AuthorsController, only: [:index, :show, :create, :delete, :update]
+    resources "/publishers", PublishersController, only: [:index, :show, :create, :delete, :update]
     resources "/books_authors", BooksAuthorsController, only: [:index, :show, :create, :delete, :update]
+    resources "/books_publishers", BooksPublishersController, only: [:index, :show, :create, :delete, :update]
 
   end
 

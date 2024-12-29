@@ -97,6 +97,7 @@ defmodule BooksApiWeb.BooksController do
         case Books.delete_book(book) do
           {:ok, _book} ->
             conn
+						|> put_status(:no_content)
             |> send_resp(:no_content, "")  # Return 204 No Content for successful deletion
 
           {:error, _reason} ->

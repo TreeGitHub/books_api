@@ -2,6 +2,7 @@ defmodule BooksApi.Authors do
   import Ecto.Query, warn: false
   alias BooksApi.Repo
   alias BooksApi.Authors.Author
+  @spec list_authors() :: any()
   def list_authors do
     Repo.all(Author)
   end
