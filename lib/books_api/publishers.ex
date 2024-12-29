@@ -13,18 +13,19 @@ defmodule BooksApi.Publishers do
     Repo.get_by(Publisher, name: name)
   end
   def create_publisher(attrs \\ %{}) do
-    name = attrs["name"]
+    %Publisher{}
+    |> Publisher.changeset(attrs)
+    |> case do
+      %{valid?: true} = changeset ->
+        name = attrs["name"]
 
-    case Repo.get_by(Publisher, name: name) do
-      nil ->
-        # Proceed with inserting the publisher, including all attributes
-        %Publisher{}
-        |> Publisher.changeset(attrs)
-        |> Repo.insert()
+        case Repo.get_by(Publisher, name: name) do
+          nil -> Repo.insert(changeset)
+          _existing_publisher -> {:error, :publisher_exists}
+        end
 
-      _existing_publisher ->
-        # The name is already taken by another publisher
-        {:error, :publisher_exists}
+      changeset ->
+        {:error, changeset}
     end
   end
   def update_publisher(id, attrs \\ %{}) do
