@@ -2,17 +2,17 @@ defmodule BooksApiWeb.Router do
   use BooksApiWeb, :router
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug(:accepts, ["json"])
   end
 
   scope "/api", BooksApiWeb do
-    pipe_through :api
-    resources "/books", BooksController, only: [:index, :show, :create, :update, :delete]
-    resources "/authors", AuthorsController, only: [:index, :show, :create, :delete, :update]
-    resources "/publishers", PublishersController, only: [:index, :show, :create, :delete, :update]
-    resources "/books_authors", BooksAuthorsController, only: [:index, :show, :create, :delete, :update]
-    resources "/books_publishers", BooksPublishersController, only: [:index, :show, :create, :delete, :update]
+    pipe_through(:api)
+    resources("/books", BooksController, only: [:index, :show, :create, :update, :delete])
+    resources("/authors", AuthorsController, only: [:index, :show, :create, :delete, :update])
 
+    resources("/books_authors", BooksAuthorsController,
+      only: [:index, :show, :create, :delete, :update]
+    )
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
@@ -25,10 +25,10 @@ defmodule BooksApiWeb.Router do
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
-      pipe_through [:fetch_session, :protect_from_forgery]
+      pipe_through([:fetch_session, :protect_from_forgery])
 
-      live_dashboard "/dashboard", metrics: BooksApiWeb.Telemetry
-      forward "/mailbox", Plug.Swoosh.MailboxPreview
+      live_dashboard("/dashboard", metrics: BooksApiWeb.Telemetry)
+      forward("/mailbox", Plug.Swoosh.MailboxPreview)
     end
   end
 end
