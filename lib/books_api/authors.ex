@@ -13,18 +13,19 @@ defmodule BooksApi.Authors do
     Repo.get_by(Author, name: name)
   end
   def create_author(attrs \\ %{}) do
-    name = attrs["name"]
-    # Check if the name already exists in the database (excluding the current author)
-    case Repo.get_by(Author, name: name) do
-      nil ->
-        # Proceed with updating the author
-        %Author{}
-        |> Author.changeset(attrs)
-        |> Repo.insert()
+    %Author{}
+    |> Author.changeset(attrs)
+    |> case do
+      %{valid?: true} = changeset ->
+        name = attrs["name"]
 
-      _existing_author ->
-        # The name is already taken by another author
-        {:error, :author_exists}
+        case Repo.get_by(Author, name: name) do
+          nil -> Repo.insert(changeset)
+          _existing_author -> {:error, :author_exists}
+        end
+
+      changeset ->
+        {:error, changeset}
     end
   end
   def update_author(id, attrs \\ %{}) do
