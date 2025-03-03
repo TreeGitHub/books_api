@@ -21,9 +21,9 @@ defmodule BooksApiWeb.BooksJSON do
       genre: book.genre,
       rating: book.rating,
       inserted_at: book.inserted_at,
-      updated_at: book.updated_at
+      updated_at: book.updated_at,
       # Include authors data
-      # authors: authors_data(book.authors)
+      authors: authors_data(book.authors)
     }
   end
 
