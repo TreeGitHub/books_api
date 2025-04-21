@@ -16,6 +16,10 @@ defmodule BooksApiWeb.Router do
     resources("/books_authors", BooksAuthorsController,
       only: [:index, :show, :create, :delete, :update]
     )
+
+    resources "/users", UserController, only: [] do
+      resources("/reading_list", ReadingListsController, only: [:index, :create, :delete])
+    end
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

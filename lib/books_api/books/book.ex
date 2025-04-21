@@ -13,6 +13,7 @@ defmodule BooksApi.Books.Book do
     # Establish the relationship with BooksAuthors and Authors
     has_many(:books_authors, BooksApi.BooksAuthors.BookAuthor)
     has_many(:authors, through: [:books_authors, :author])
+    has_many(:reading_lists, BooksApi.ReadingLists.ReadingList)
 
     timestamps()
   end
