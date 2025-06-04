@@ -10,6 +10,14 @@ defmodule BooksApi.Users do
     |> Repo.all()
   end
 
+  def get_user(name, password) do
+    from(u in "users",
+      where: u.name == ^name and u.password_hash == ^password,
+      select: u.id
+    )
+    |> Repo.one()
+  end
+
   def add_book_to_reading_list(user_id, book_id) do
     %ReadingList{}
     |> ReadingList.changeset(%{user_id: user_id, book_id: book_id})

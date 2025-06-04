@@ -5,6 +5,7 @@ defmodule BooksApi.Users.User do
   schema "users" do
     field(:name, :string)
     field(:email, :string)
+    field(:password_hash, :string)
 
     has_many(:reading_lists, BooksApi.ReadingLists.ReadingList)
 
@@ -15,7 +16,7 @@ defmodule BooksApi.Users.User do
   def changeset(user, attrs) do
     user
     |> cast(attrs, [:name, :email])
-    |> validate_required([:name, :email])
+    |> validate_required([:name, :email, :password_hash])
     |> validate_format(:email, ~r/@/, message: "must be a valid email")
   end
 end
