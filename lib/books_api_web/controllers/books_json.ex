@@ -3,11 +3,11 @@ defmodule BooksApiWeb.BooksJSON do
   alias BooksApi.Authors.Author
 
   def index(%{books: books}) do
-    %{data: for(book <- books, do: data(book))}
+    for(book <- books, do: data(book))
   end
 
   def show(%{book: book}) do
-    %{data: data(book)}
+    data(book)
   end
 
   # Converts a Book struct into a map with selected fields

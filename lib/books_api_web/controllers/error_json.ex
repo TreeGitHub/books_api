@@ -17,4 +17,16 @@ defmodule BooksApiWeb.ErrorJSON do
   def render(_template, _assigns) do
     %{errors: %{detail: "An unknown error occurred"}}
   end
+
+  defmodule BooksApiWeb.ErrorJSON do
+    def render("422.json", %{errors: errors}) do
+      %{errors: format_errors(errors)}
+    end
+
+    defp format_errors(errors) when is_list(errors) do
+      Enum.into(errors, %{}, fn {field, {message, _opts}} -> {field, message} end)
+    end
+
+    defp format_errors(errors), do: errors
+  end
 end

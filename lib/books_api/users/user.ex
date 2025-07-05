@@ -3,6 +3,7 @@ defmodule BooksApi.Users.User do
   import Ecto.Changeset
 
   schema "users" do
+    field(:username, :string)
     field(:name, :string)
     field(:email, :string)
     field(:password_hash, :string)
@@ -15,8 +16,9 @@ defmodule BooksApi.Users.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:name, :email])
-    |> validate_required([:name, :email, :password_hash])
+    |> cast(attrs, [:username, :name, :email, :password_hash])
+    |> validate_required([:username, :email, :password_hash])
     |> validate_format(:email, ~r/@/, message: "must be a valid email")
+    |> unique_constraint(:username, message: "Username must be unique")
   end
 end

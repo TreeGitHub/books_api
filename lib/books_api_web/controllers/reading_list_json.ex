@@ -6,11 +6,11 @@ defmodule BooksApiWeb.ReadingListJSON do
     IO.inspect(reading_lists, label: "👀 reading_lists passed to index/1")
 
     # No need to map to reading_list.book manually
-    %{data: Enum.map(reading_lists, &data/1)}
+    Enum.map(reading_lists, &data/1)
   end
 
   def show(%{reading_list: reading_list}) do
-    %{data: data(reading_list)}
+    data(reading_list)
   end
 
   # 🎯 Handle ReadingList by delegating to the Book

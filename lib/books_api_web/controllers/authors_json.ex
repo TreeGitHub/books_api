@@ -1,11 +1,12 @@
 defmodule BooksApiWeb.AuthorsJson do
   alias BooksApi.Authors.Author
 
-	def index(%{authors: authors}) do
-		%{data: for(author <- authors, do: data(author))}
-	end
+  def index(%{authors: authors}) do
+    for(author <- authors, do: data(author))
+  end
+
   def show(%{author: author}) do
-    %{data: data(author)}
+    data(author)
   end
 
   defp data(%Author{} = author) do
