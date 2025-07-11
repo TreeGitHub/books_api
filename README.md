@@ -38,15 +38,33 @@ This is the backend of the Chapters book tracking app. It provides a RESTful API
 
     Returns JSON responses for use by the React frontend (chapters_ui)
 
-🚀 Getting Started
+🛠️ Environment Setup
 
-To start the Phoenix server:
+To run this project locally, make sure you have the following installed:
 
-mix setup # Installs dependencies and sets up the DB
-mix phx.server # Starts the server
+📦 Prerequisites
+Tool Version (Recommended)
+Elixir 1.15+
+Erlang/OTP 25+
+Phoenix 1.7+
+PostgreSQL 13+
+Node.js 18+ (for asset bundling)
+npm Comes with Node
 
-or for IEx:
+📎 Tip: If you’re using asdf for version management, your .tool-versions file might look like:
 
-iex -S mix phx.server
+    elixir 1.15.0-otp-25
+    erlang 25.3
+    nodejs 18.17.0
 
-Then visit http://localhost:4000 in your browser.
+🧪 Setup Steps
+
+1. Install dependencies and setup DB
+   mix setup
+
+2. Start the Phoenix server
+   mix phx.server
+   or for interactive debugging:
+   iex -S mix phx.server
+
+3. Visit http://localhost:4000 in your browser.
