@@ -44,7 +44,7 @@ To start the Phoenix server:
 mix setup # Installs dependencies and sets up the DB
 mix phx.server # Starts the server
 
-# or for IEx:
+or for IEx:
 
 iex -S mix phx.server
 
