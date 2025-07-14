@@ -24,10 +24,7 @@ defmodule BooksApi.Users do
     |> User.changeset(attrs)
     |> case do
       %{valid?: true} = changeset ->
-        name = attrs["name"]
         username = attrs["username"]
-        email = attrs["email"]
-        password_hash = attrs["password_hash"]
 
         case Repo.get_by(User, username: username) do
           nil -> Repo.insert(changeset)

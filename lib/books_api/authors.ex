@@ -6,18 +6,21 @@ defmodule BooksApi.Authors do
   def list_authors do
     Repo.all(Author)
   end
+
   def get_author(id) do
     Repo.get(Author, id)
   end
+
   def find_by_name(name) do
     Repo.get_by(Author, name: name)
   end
+
   def create_author(attrs \\ %{}) do
     %Author{}
     |> Author.changeset(attrs)
     |> case do
       %{valid?: true} = changeset ->
-        name = attrs["name"]
+        name = Map.get(attrs, "name") || Map.get(attrs, :name)
 
         case Repo.get_by(Author, name: name) do
           nil -> Repo.insert(changeset)
@@ -28,6 +31,7 @@ defmodule BooksApi.Authors do
         {:error, changeset}
     end
   end
+
   def update_author(id, attrs \\ %{}) do
     case Repo.get(Author, id) do
       nil ->
@@ -50,12 +54,15 @@ defmodule BooksApi.Authors do
         end
     end
   end
+
   def delete_author(%Author{} = author) do
     Repo.delete(author)
   end
+
   def change_author(%Author{} = author, attrs \\ %{}) do
     Author.changeset(author, attrs)
   end
+
   def find_or_create_author(%{"name" => name}) do
     case Repo.get_by(Author, name: name) do
       nil ->

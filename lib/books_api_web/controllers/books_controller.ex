@@ -52,11 +52,6 @@ defmodule BooksApiWeb.BooksController do
         |> put_view(BooksApiWeb.BooksJSON)
         |> render("show.json", book: book)
 
-      {:error, :author_exists} ->
-        conn
-        |> put_status(:conflict)
-        |> json(%{error: "Author already exists"})
-
       {:error, :book_creation_failed} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -146,8 +141,10 @@ defmodule BooksApiWeb.BooksController do
       _book ->
         case Books.update_book(id, book_params) do
           {:ok, book} ->
+            # Preload authors here before rendering
+            book = Books.get_book_with_authors(book.id)
+
             conn
-            # Explicitly use AuthorsJson here
             |> put_view(BooksApiWeb.BooksJSON)
             |> render("show.json", book: book)
         end
