@@ -12,8 +12,8 @@ defmodule BooksApi.HellgateClient do
         items:
           Enum.map(cart, fn item ->
             %{
-              name: item["title"],
-              amount: parse_price(item["price"])
+              name: item.title,
+              amount: parse_price(item.price)
             }
           end)
       }
