@@ -7,6 +7,7 @@ defmodule BooksApi.Users.User do
     field(:name, :string)
     field(:email, :string)
     field(:password_hash, :string)
+    field(:billing_address, :string)
 
     has_many(:reading_lists, BooksApi.ReadingLists.ReadingList)
 
@@ -16,7 +17,7 @@ defmodule BooksApi.Users.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:username, :name, :email, :password_hash])
+    |> cast(attrs, [:username, :name, :email, :password_hash, :billing_address])
     |> validate_required([:username, :email, :password_hash])
     |> validate_format(:email, ~r/@/, message: "must be a valid email")
     |> unique_constraint(:username, message: "Username must be unique")

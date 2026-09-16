@@ -28,7 +28,8 @@ defmodule BooksApiWeb.UsersController do
       "name" => user_params["name"],
       "username" => user_params["username"],
       "password_hash" => user_params["password"],
-      "email" => user_params["email"]
+      "email" => user_params["email"],
+      "billing_address" => user_params["billing_address"]
     }
 
     case Users.create_user(user_params) do
