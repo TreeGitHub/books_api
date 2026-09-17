@@ -23,6 +23,7 @@ defmodule BooksApiWeb.Router do
     end
 
     post("/checkout/session", CheckoutController, :create)
+    post("/checkout/charge", CheckoutController, :charge)
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
