@@ -2,6 +2,7 @@ defmodule BooksApiWeb.CheckoutController do
   use BooksApiWeb, :controller
   alias BooksApi.HellgateClient
   alias BooksApi.Books
+  alias BooksApi.Orders
 
   @reference_words [
     "alpha",
@@ -60,30 +61,32 @@ defmodule BooksApiWeb.CheckoutController do
     |> json(%{error: "Invalid checkout request. Please provide a valid cart."})
   end
 
-  defp parse_price_to_cents(price) do
-    {value, _} = Float.parse(String.replace(price, "$", ""))
-    round(value * 100)
-  end
-
-  def charge(conn, %{"cart" => cart, "token_id" => token_id}) do
+  def charge(conn, %{"cart" => cart, "token_id" => token_id, "user_id" => user_id}) do
     reference = generate_reference()
     books = Enum.map(cart, fn item -> Books.get_book(item["id"]) end)
 
     total_cents =
       books
       |> Enum.map(fn book -> book.price end)
-      |> Enum.map(&parse_price_to_cents/1)
+      |> Enum.map(&Orders.parse_price_to_cents/1)
       |> Enum.sum()
 
     with {:ok, %{"network_token_status" => "active"}} <- HellgateClient.get_token_status(token_id),
          {:ok, %{"id" => payment_data_id}} <-
            HellgateClient.request_payment_data(token_id, total_cents, reference),
-         {:ok, forward_result} <- HellgateClient.forward_payment_data(payment_data_id, reference) do
-      IO.inspect(forward_result, label: "forward_result")
-      json(conn, %{status: "received", forward_result: forward_result})
+         {:ok, forward_result} <- HellgateClient.forward_payment_data(payment_data_id, reference),
+         {:ok, %{order: order}} <-
+           Orders.create_order(user_id, books, total_cents, reference, "paid") do
+      IO.inspect(order, label: "order created")
+      json(conn, %{status: "received", order_id: order.id})
     else
       error ->
         IO.inspect(error, label: "charge failed")
+
+        case Orders.create_order(user_id, books, total_cents, reference, "failed") do
+          {:ok, _} -> IO.inspect("failed order recorded", label: "orders")
+          {:error, reason} -> IO.inspect(reason, label: "failed to record failed order")
+        end
 
         conn
         |> put_status(:bad_request)
