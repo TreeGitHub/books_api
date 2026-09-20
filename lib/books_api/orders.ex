@@ -49,4 +49,11 @@ defmodule BooksApi.Orders do
     |> order_by([o], desc: o.inserted_at)
     |> Repo.all()
   end
+
+  def get_order_for_user(user_id, order_id) do
+    Order
+    |> where([o], o.user_id == ^user_id and o.id == ^order_id)
+    |> Repo.one()
+    |> Repo.preload(order_items: :book)
+  end
 end
