@@ -15,7 +15,8 @@ defmodule BooksApi.Orders do
       |> Order.changeset(%{
         user_id: user_id,
         total_price: total_cents / 100,
-        status: status
+        status: status,
+        reference: reference
       })
 
     Ecto.Multi.new()
@@ -40,5 +41,12 @@ defmodule BooksApi.Orders do
       end
     end)
     |> Repo.transaction()
+  end
+
+  def list_orders_for_user(user_id) do
+    Order
+    |> where([o], o.user_id == ^user_id)
+    |> order_by([o], desc: o.inserted_at)
+    |> Repo.all()
   end
 end

@@ -20,6 +20,7 @@ defmodule BooksApiWeb.Router do
 
     resources "/users", UserController, only: [] do
       resources("/reading_list", ReadingListsController, only: [:index, :create, :delete])
+      resources("/orders", OrdersController, only: [:index])
     end
 
     post("/checkout/session", CheckoutController, :create)
